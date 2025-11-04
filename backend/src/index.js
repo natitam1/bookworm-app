@@ -9,6 +9,7 @@ const app = express();
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/books", bookRoutes);
 
 app.listen(PORT, () => [
   console.log(`Server is running on http://localhost:${PORT}`),
