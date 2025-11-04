@@ -29,6 +29,17 @@ router.post("/register", async (req, res) => {
     if (existingUsername) {
       return res.status(400).json({ message: "User already exists" });
     }
+
+    const profileImage = `https://api.dicebear.com/9.x/adventurer/svg?seed=${username}`;
+
+    const user = new User({
+      email,
+      username,
+      password,
+      profileImage,
+    });
+
+    await user.save();
   } catch (error) {}
 });
 router.post("/login", async (req, res) => {
