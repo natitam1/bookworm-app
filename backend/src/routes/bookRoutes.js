@@ -3,7 +3,7 @@ import cloudinary from "../lib/cloudinary.js";
 
 const router = express.Router();
 
-router.post("/", async (req, res) => {
+router.post("/", protectRoute, async (req, res) => {
   try {
     const { title, caption, rating, image } = req.body;
     if (!title || !caption || !rating || !image) {
@@ -22,7 +22,15 @@ router.post("/", async (req, res) => {
       image: imageUrl,
       //   user: req.user._id,
     });
-  } catch (error) {}
+
+    await newBook.save();
+    res.status(201).json({
+      newBook,
+    });
+  } catch (error) {
+    console.log("Error creating book", error);
+    res.status(500).json({ message: error.message });
+  }
 });
 
 export default router;
