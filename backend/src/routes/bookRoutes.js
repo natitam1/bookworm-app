@@ -70,6 +70,15 @@ router.delete("/:id", protectRoute, async (req, res) => {
     if (book.user.toString() !== req.user._id.toString())
       return res.status(401).json({ message: "Unauthorized" });
 
+    // Delete from cloudinary
+    if (book.image && book.image.includes("cloudinary")) {
+      try {
+        const publicId = book.image.split("/").pop().split(".")[0];
+        await cloudinary.uploader.destroy(publicId);
+      } catch (deleteError) {
+        console.log("Error deleting image from cloudinary", deleteError);
+      }
+    }
     await book.deleteOne();
     res.json({ message: "Book deleted successfully" });
   } catch (error) {
