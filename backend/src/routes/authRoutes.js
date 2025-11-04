@@ -45,6 +45,8 @@ router.post("/register", async (req, res) => {
     });
 
     await user.save();
+
+    const token = generateToken(user._id);
   } catch (error) {}
 });
 router.post("/login", async (req, res) => {
