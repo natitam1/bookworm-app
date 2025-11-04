@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema({
-  userName: { type: String, required: true, unique: true },
+  username: { type: String, required: true, unique: true },
   email: {
     type: String,
     required: true,
@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
     default: "",
   },
 });
-
+s;
 // Hash password before saving to db
 
 userSchema.pre("save", async function (next) {
