@@ -61,4 +61,20 @@ router.get("/", protectRoute, async (req, res) => {
   }
 });
 
+router.delete("/:id", protectRoute, async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id);
+    if (!book) return res.status(404).json({ message: "Book not found" });
+
+    // check if user is the creator of the book
+    if (book.user.toString() !== req.user._id.toString())
+      return res.status(401).json({ message: "Unauthorized" });
+
+    await book.deleteOne();
+    res.json({ message: "Book deleted successfully" });
+  } catch (error) {
+    console.log("Error deleting book", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 export default router;
