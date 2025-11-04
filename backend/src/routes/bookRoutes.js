@@ -86,4 +86,16 @@ router.delete("/:id", protectRoute, async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+router.get("/users", async (req, res) => {
+  try {
+    const books = await Book.find({ user: req.user._id }).sort({
+      createAt: -1,
+    });
+    res.json(books);
+  } catch (error) {
+    console.log("Get user books error:", error.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 export default router;
