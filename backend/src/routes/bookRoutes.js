@@ -45,7 +45,14 @@ router.get("/", protectRoute, async (req, res) => {
       .skip(skip)
       .limit(limit)
       .populate("user", "username profileImage");
-    res.send(books);
+
+    const totalBooks = await Book.countDocuments();
+    res.send({
+      books,
+      currentPage: page,
+      totalBooks,
+      totalPages: Math.ceil(totalBooks / limit),
+    });
   } catch (error) {
     console.log("Error in get all books route", error);
     res.status(500).json({
