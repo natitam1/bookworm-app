@@ -76,6 +76,18 @@ router.post("/login", async (req, res) => {
     const isPasswordCorrect = await user.comparePassword(password);
     if (!isPasswordCorrect)
       return res.status(400).json({ message: "Invalid credentials" });
+
+    const token = generateToken(user._id);
+
+    res.status(200).json({
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        profileImage: user.profileImage,
+      },
+    });
   } catch (error) {
     console.log("Error in Login route", error);
     res.status(500).json({
