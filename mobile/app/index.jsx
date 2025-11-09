@@ -1,25 +1,12 @@
-import { Text, View } from "react-native";
-import { Image } from "expo-image";
+import { Link } from "expo-router";
+import { Pressable, Text } from "react-native";
 
-export default function Index() {
+export default function HomeScreen() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>This is Nati</Text>
-      <Image
-        source={{
-          uri: "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
-        }}
-        style={{ width: 200, height: 200, borderRadius: 10 }}
-        contentFit="cover"
-        transition={500}
-        cachePolicy="memory-disk"
-      />
-    </View>
+    <Link href="/(auth)" asChild>
+      <Pressable style={{ padding: 10, backgroundColor: "blue" }}>
+        <Text style={{ color: "white" }}>Go to Profile</Text>
+      </Pressable>
+    </Link>
   );
 }
