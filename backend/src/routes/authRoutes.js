@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post("/register", async (req, res) => {
   try {
-    const { email, password, username } = req.body();
+    const { email, password, username } = req.body;
     if (!email || !password || !username) {
       return res.status(400).json({ message: "All fids are required" });
     }
@@ -27,19 +27,19 @@ router.post("/register", async (req, res) => {
 
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
-      return res.status(400).json({ message: "Username already exists" });
+      return res.status(400).json({ message: "Email already exists" });
     }
 
-    const existingUsername = User.findOne({ username });
+    const existingUsername = await User.findOne({ username });
     if (existingUsername) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ message: "Username already exists" });
     }
 
     const profileImage = `https://api.dicebear.com/9.x/adventurer/svg?seed=${username}`;
 
     const user = new User({
       email,
-      username,
+      username: username,
       password,
       profileImage,
     });

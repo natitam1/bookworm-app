@@ -9,13 +9,16 @@ export const useAuthStore = create((set) => ({
   register: async (username, email, password) => {
     set({ isLoading: true });
     try {
-      const response = await fetch("https://localhost:3000/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, email, password }),
-      });
+      const response = await fetch(
+        "http://10.4.116.202:3000/api/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, email, password }),
+        }
+      );
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
       await AsyncStorage.setItem("user", JSON.stringify(data.user));
@@ -29,7 +32,6 @@ export const useAuthStore = create((set) => ({
     } catch (error) {
       set({ isLoading: false });
       return { success: false, error: error.message };
-      console.log(error);
     }
   },
 }));
