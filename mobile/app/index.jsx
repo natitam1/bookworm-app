@@ -14,7 +14,7 @@ export default function HomeScreen() {
         <Text>{token}</Text>
         <Text>{user?.username}</Text>
         <TouchableOpacity style={{ backgroundColor: "#000" }} onPress={logout}>
-          Logout
+          <Text>Logout</Text>
         </TouchableOpacity>
         <Text style={{ color: "white" }}>Go to Profile</Text>
       </Pressable>
