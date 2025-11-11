@@ -1,10 +1,10 @@
 import { Link } from "expo-router";
 import { useEffect } from "react";
 import { useAuthStore } from "../store/authStore";
-import { Pressable, Text } from "react-native";
+import { Pressable, Text, TouchableOpacity } from "react-native";
 
 export default function HomeScreen() {
-  const { user, token, checkAuth } = useAuthStore();
+  const { user, token, checkAuth, logout } = useAuthStore();
   useEffect(() => {
     checkAuth();
   }, []);
@@ -13,6 +13,9 @@ export default function HomeScreen() {
       <Pressable style={{ padding: 10, backgroundColor: "blue" }}>
         <Text>{token}</Text>
         <Text>{user?.username}</Text>
+        <TouchableOpacity style={{ backgroundColor: "#000" }} onPress={logout}>
+          Logout
+        </TouchableOpacity>
         <Text style={{ color: "white" }}>Go to Profile</Text>
       </Pressable>
     </Link>
