@@ -10,7 +10,7 @@ export const useAuthStore = create((set) => ({
     set({ isLoading: true });
     try {
       const response = await fetch(
-        "http://10.4.116.202:3000/api/auth/register",
+        "https://bookworm-app-backend-lzfm.onrender.com/api/auth/register",
         {
           method: "POST",
           headers: {
