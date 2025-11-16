@@ -4,26 +4,32 @@ import SafeScreen from "../components/SafeScreen";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
 import { useAuthStore } from "../store/authStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function RootLayout() {
   const router = useRouter();
   const segments = useSegments();
-
   const { checkAuth, user, token } = useAuthStore();
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     checkAuth();
+    setReady(true); // mark layout ready after auth check
   }, []);
 
-  // handle navigation based on the auth state
   useEffect(() => {
+    if (!ready) return; // don't navigate until ready
+
     const inAuthScreen = segments[0] === "(auth)";
     const isSignedIn = user && token;
 
     if (!isSignedIn && !inAuthScreen) router.replace("/(auth)");
     else if (isSignedIn && inAuthScreen) router.replace("/(tabs)");
-  }, [user, token, segments]);
+  }, [user, token, segments, ready]);
+
+  // Render nothing until ready
+  if (!ready) return null;
+
   return (
     <SafeAreaProvider>
       <SafeScreen>
