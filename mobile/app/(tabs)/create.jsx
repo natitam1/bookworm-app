@@ -1,6 +1,16 @@
-import { View, Text } from "react-native";
+import {
+  View,
+  Text,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TextInput,
+} from "react-native";
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
+import styles from "../../assets/styles/create.styles";
+import { Ionicons } from "@expo/vector-icons";
+import COLORS from "../../constants/colors";
 
 const create = () => {
   const [title, setTitle] = useState("");
@@ -16,9 +26,46 @@ const create = () => {
   const handleSubmit = async () => {};
 
   return (
-    <View>
-      <Text>create</Text>
-    </View>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <ScrollView
+        contentContainerStyle={styles.container}
+        style={styles.scrollViewStyle}
+      >
+        <View style={styles.card}>
+          {/* HEADER */}
+          <View style={styles.header}>
+            <Text style={styles.title}>Add Book Recommendation</Text>
+            <Text style={styles.subtitle}>
+              Share your favorite reads with others
+            </Text>
+          </View>
+          <View style={styles.form}>
+            {/* BOOK TITLE */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Book Title</Text>
+              <View style={styles.inputContainer}>
+                <Ionicons
+                  name="book-outline"
+                  size={20}
+                  color={COLORS.textSecondary}
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter book title"
+                  placeholderTextColor={COLORS.placeholderText}
+                  value={title}
+                  onChangeText={setTitle}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
