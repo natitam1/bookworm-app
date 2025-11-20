@@ -7,11 +7,10 @@ export const useAuthStore = create((set, get) => ({
   token: null,
   isLoading: false,
 
-  // helper to produce Authorization header
   getAuthHeader: () => {
     const { token } = get();
     if (!token) return {};
-    return { Authorization: `Bearer ${token.trim().replace(/^"|"$/g, "")}` };
+    return { Authorization: `Bearer ${token}` };
   },
 
   register: async (username, email, password) => {
@@ -26,9 +25,33 @@ export const useAuthStore = create((set, get) => ({
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Registration failed");
 
-      let tokenStr = String(data.token).trim().replace(/^"|"$/g, "");
+      const tokenStr = data.token?.replace(/^"|"$/g, "");
       await AsyncStorage.setItem("token", tokenStr);
+      await AsyncStorage.setItem("user", JSON.stringify(data.user));
+
       set({ token: tokenStr, user: data.user, isLoading: false });
+      return { success: true };
+    } catch (error) {
+      set({ isLoading: false });
+      return { success: false, error: error.message };
+    }
+  },
+
+  login: async (email, password) => {
+    set({ isLoading: true });
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Login failed");
+
+      const tokenStr = data.token?.replace(/^"|"$/g, "");
+      await AsyncStorage.setItem("token", tokenStr);
+      await AsyncStorage.setItem("user", JSON.stringify(data.user));
 
       set({ token: tokenStr, user: data.user, isLoading: false });
       return { success: true };
@@ -44,11 +67,7 @@ export const useAuthStore = create((set, get) => ({
       const userJson = await AsyncStorage.getItem("user");
       const user = userJson ? JSON.parse(userJson) : null;
 
-      let token = tokenRaw ? tokenRaw.trim() : null;
-      token = token?.replace(/^"|"$/g, "");
-      if (token && token.startsWith("Bearer ")) token = token.slice(7);
-      token = token?.replace(/^"|"$/g, ""); // remove extra quotes
-
+      const token = tokenRaw ? tokenRaw.replace(/^"|"$/g, "") : null;
       set({ token, user });
     } catch (error) {
       console.log("Auth check failed", error);
@@ -56,31 +75,8 @@ export const useAuthStore = create((set, get) => ({
   },
 
   logout: async () => {
-    await AsyncStorage.clear(); // remove everything
+    await AsyncStorage.removeItem("token");
+    await AsyncStorage.removeItem("user");
     set({ user: null, token: null });
-  },
-
-  login: async (email, password) => {
-    set({ isLoading: true });
-    try {
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Login failed");
-
-      let tokenStr = String(data.token).trim().replace(/^"|"$/g, "");
-      await AsyncStorage.setItem("token", tokenStr);
-      set({ token: tokenStr, user: data.user, isLoading: false });
-
-      set({ token: tokenStr, user: data.user, isLoading: false });
-      return { success: true };
-    } catch (error) {
-      set({ isLoading: false });
-      return { success: false, error: error.message };
-    }
   },
 }));

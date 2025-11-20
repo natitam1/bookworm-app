@@ -10,9 +10,8 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuthStore } from "../../store/authStore";
-
 import { useRouter } from "expo-router";
 import styles from "../../assets/styles/create.styles";
 import { Ionicons } from "@expo/vector-icons";
@@ -30,46 +29,11 @@ const Create = () => {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
-  const { token } = useAuthStore();
+  const { token, getAuthHeader, checkAuth } = useAuthStore();
 
-  // const imagePicker = async () => {
-  //   try {
-  //     const { status } =
-  //       await ImagePicker.requestMediaLibraryPermissionsAsync();
-  //     if (status !== "granted") {
-  //       Alert.alert(
-  //         "Permission Denied",
-  //         "We need camera roll permissions to upload an image"
-  //       );
-  //       return;
-  //     }
-
-  //     const result = await ImagePicker.launchImageLibraryAsync({
-  //       mediaTypes: "images",
-  //       allowsEditing: true,
-  //       aspect: [4, 3],
-  //       quality: 0.5,
-  //       base64: true,
-  //     });
-
-  //     if (!result.canceled && result.assets.length > 0) {
-  //       const picked = result.assets[0];
-  //       setImage(picked.uri);
-  //       setImageBase64(picked.base64);
-  //     } else {
-  //       // Otherwise, convert to base64
-  //       const base64 = await FileSystem.readAsStringAsync(
-  //         result.assets[0].uri,
-  //         {
-  //           encoding: FileSystem.EncodingType.Base64,
-  //         }
-  //       );
-  //       setImageBase64(base64);
-  //     }
-  //   } catch (error) {
-  //     console.log("ImagePicker Error:", error);
-  //   }
-  // };
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   const imagePicker = async () => {
     try {
@@ -84,19 +48,18 @@ const Create = () => {
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images, // Corrected
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.5,
-        base64: true, // Request base64 directly
+        base64: true,
       });
 
       if (!result.canceled && result.assets.length > 0) {
         const picked = result.assets[0];
-        setImage(picked.uri); // Set the image URI
-        let base64Content = picked.base64;
+        setImage(picked.uri);
 
-        // If base64 was not provided by the picker (sometimes it's not), read it manually
+        let base64Content = picked.base64;
         if (!base64Content) {
           base64Content = await FileSystem.readAsStringAsync(picked.uri, {
             encoding: FileSystem.EncodingType.Base64,
@@ -106,6 +69,7 @@ const Create = () => {
       }
     } catch (error) {
       console.log("ImagePicker Error:", error);
+      Alert.alert("Error", "Failed to pick image");
     }
   };
 
@@ -114,6 +78,12 @@ const Create = () => {
       Alert.alert("Error", "Please fill in all fields");
       return;
     }
+
+    if (!token) {
+      Alert.alert("Error", "You are not logged in");
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -124,10 +94,12 @@ const Create = () => {
         : "image/jpeg";
       const imageDataUrl = `data:${imageType};base64,${imageBase64}`;
 
+      console.log("Sending token:", token); // debug
+
       const response = await fetch(`${API_URL}/books`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
+          ...getAuthHeader(),
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -138,19 +110,27 @@ const Create = () => {
         }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error("Server returned non-JSON response");
+      }
+
       if (!response.ok) throw new Error(data.message || "Something went wrong");
 
       Alert.alert("Success", "Your book recommendation has been posted!");
       setTitle("");
       setCaption("");
-      setRating("");
+      setRating(3);
       setImage(null);
       setImageBase64(null);
       router.push("/");
-      console.log("TOKEN SENT:", token);
     } catch (error) {
-      console.log(error);
+      console.log("Submit Error:", error);
+      Alert.alert("Error", error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -184,7 +164,6 @@ const Create = () => {
         style={styles.scrollViewStyle}
       >
         <View style={styles.card}>
-          {/* HEADER */}
           <View style={styles.header}>
             <Text style={styles.title}>Add Book Recommendation</Text>
             <Text style={styles.subtitle}>
@@ -193,7 +172,6 @@ const Create = () => {
           </View>
 
           <View style={styles.form}>
-            {/* BOOK TITLE */}
             <View style={styles.formGroup}>
               <Text style={styles.label}>Book Title</Text>
               <View style={styles.inputContainer}>
@@ -213,13 +191,11 @@ const Create = () => {
               </View>
             </View>
 
-            {/* RATING */}
             <View style={styles.formGroup}>
               <Text style={styles.label}>Your Rating</Text>
               {renderRatingPicker()}
             </View>
 
-            {/* IMAGE */}
             <View style={styles.formGroup}>
               <Text style={styles.label}>Book Image</Text>
               <TouchableOpacity
@@ -242,7 +218,7 @@ const Create = () => {
                 )}
               </TouchableOpacity>
             </View>
-            {/* CAPTION */}
+
             <View style={styles.formGroup}>
               <Text style={styles.label}>Caption</Text>
               <TextInput
@@ -254,6 +230,7 @@ const Create = () => {
                 multiline
               />
             </View>
+
             <TouchableOpacity
               style={styles.button}
               onPress={handleSubmit}
