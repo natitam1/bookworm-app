@@ -25,7 +25,7 @@ export const useAuthStore = create((set, get) => ({
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Registration failed");
 
-      const tokenStr = data.token?.replace(/^"|"$/g, "");
+      const tokenStr = String(data.token); // ensure it's a string
       await AsyncStorage.setItem("token", tokenStr);
       await AsyncStorage.setItem("user", JSON.stringify(data.user));
 
@@ -49,7 +49,7 @@ export const useAuthStore = create((set, get) => ({
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Login failed");
 
-      const tokenStr = data.token?.replace(/^"|"$/g, "");
+      const tokenStr = String(data.token); // ensure no extra quotes
       await AsyncStorage.setItem("token", tokenStr);
       await AsyncStorage.setItem("user", JSON.stringify(data.user));
 
@@ -67,7 +67,7 @@ export const useAuthStore = create((set, get) => ({
       const userJson = await AsyncStorage.getItem("user");
       const user = userJson ? JSON.parse(userJson) : null;
 
-      const token = tokenRaw ? tokenRaw.replace(/^"|"$/g, "") : null;
+      const token = tokenRaw ? String(tokenRaw) : null; // safe string conversion
       set({ token, user });
     } catch (error) {
       console.log("Auth check failed", error);

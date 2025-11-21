@@ -50,7 +50,7 @@ const Create = () => {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        aspect: [4, 3],
+        aspect: [2, 3],
         quality: 0.5,
         base64: true,
       });
