@@ -14,7 +14,7 @@ I built this **full-stack book app** in ~7 hours — works on **web, Android & i
 - Add, view & delete books
 - Infinite scroll feed
 - Profile & 4 themes
-- Web + mobile support
+- Web + mobile supports
 
 ---
 
