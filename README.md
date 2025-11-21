@@ -2,7 +2,7 @@
 
 I built this **full-stack book app** in ~7 hours — works on **web, Android & iOS** with **no paid services**.
 
-![App Demo](mobile\assets\demo.png)
+![App Demo](mobile/assets/demo.png)
 
 [GitHub Repo](https://github.com/natitam1/bookworm-app.git) | [Download](https://drive.google.com/uc?export=download&id=17iRzsOQLkiPrkUf9OtaDTTBRCyiNT-cJ)
 
