@@ -37,17 +37,18 @@ const index = () => {
       if (!response.ok)
         throw new Error(data.message || "Failed to fetch books");
 
-      // setBooks((preBooks) => [...preBooks, ...data.books]);
-      const uniqueBooks =
-        refresh || pageNum === 1
-          ? data.books
-          : Array.from(
-              new Set([...books, ...data.books].map((book) => book._id))
-            ).map((id) =>
-              [...books, ...data.books].find((book) => book._id === id)
-            );
+      setBooks((prevBooks) => {
+        if (refresh || pageNum === 1) return data.books;
 
-      setBooks(uniqueBooks);
+        const merged = [...prevBooks, ...data.books];
+
+        const unique = Array.from(new Set(merged.map((b) => b._id))).map((id) =>
+          merged.find((b) => b._id === id)
+        );
+
+        return unique;
+      });
+
       setHasMore(pageNum < data.totalPages);
       setPage(pageNum);
     } catch (error) {
@@ -111,7 +112,11 @@ const index = () => {
     return stars;
   };
 
-  const handleLoadMore = async () => {};
+  const handleLoadMore = async () => {
+    if (hasMore && !loading) {
+      fetchBooks(page + 1);
+    }
+  };
 
   return (
     <View style={styles.container}>
