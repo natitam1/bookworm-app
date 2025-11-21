@@ -1,6 +1,6 @@
 # Bookworm App 📚
 
-I built this **full-stack book app** in ~7 hours — works on **web, Android & iOS** with **no paid services**.
+I built this **full-stack book app** — works on **web, Android & iOS** with **no paid services**.
 
 ![App Demo](mobile/assets/demo.png)
 
